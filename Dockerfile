@@ -4,4 +4,6 @@ RUN mkdir -p /pg-front
 
 WORKDIR /pg-front
 
+ADD ./ ./
+
 ENTRYPOINT ng serve
