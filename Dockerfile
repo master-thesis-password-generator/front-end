@@ -6,4 +6,6 @@ WORKDIR /pg-front
 
 ADD ./ ./
 
+RUN npm install
+
 ENTRYPOINT ng serve
