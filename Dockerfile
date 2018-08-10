@@ -8,4 +8,6 @@ ADD ./ ./
 
 RUN npm install
 
+EXPOSE 4200
+
 ENTRYPOINT ng serve
