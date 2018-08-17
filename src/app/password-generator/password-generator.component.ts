@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { RCService } from './random_characters/rc.service';
 import { RCModel } from './random_characters/model/rcmodel';
@@ -16,6 +16,7 @@ import { RWFSRequest } from './random_words_from_songs/model/rwfsrequest';
 import { TesterService } from './memory_tester/tester.service';
 import { TesterRequest } from './memory_tester/model/tester_request';
 import { PGToastrService } from './commons/toastr/pgtoastr.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'password-generator',
@@ -24,9 +25,7 @@ import { PGToastrService } from './commons/toastr/pgtoastr.service';
 })
 
 export class PasswordGeneratorComponent implements OnInit {
-
-  @Input() apiLocation: string;
-
+  apiLocation: string;
   loading: boolean;
 
   /**
@@ -89,6 +88,7 @@ export class PasswordGeneratorComponent implements OnInit {
     this.rwfs_character_mappings = this.rwfs_form.get('character_mappings') as FormArray;
 
     this.test_form = this.createTestForm();
+    this.apiLocation = environment.apiLocation;
   }
 
   createRCCharacterGroups(): FormGroup {
