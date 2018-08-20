@@ -31,7 +31,7 @@ export class SongsCookieService {
         mappingChance: 50
       }
     ],
-    passwordLength: 10,
+    passwordLength: 12,
     rwCase: 'random',
     artist: 'Myslovitz'
   } as RWFSRequest;
@@ -54,7 +54,7 @@ export class SongsCookieService {
   public getCookie(): FormGroup {
     const cookieValue = this.cookieService.getCookieValue(this.COOKIE_NAME, this.DEFAULT_COOKIE_VALUE) as RWFSRequest;
     return this.formBuilder.group({
-      password_length: [cookieValue.passwordLength, [Validators.required, Validators.min(10)]],
+      password_length: [cookieValue.passwordLength, [Validators.required, Validators.min(12)]],
       character_mappings: this.formBuilder.array(
         cookieValue.mappings.map(mapping => this.formBuilder.group({
           character: [mapping.mappedCharacter, Validators.required],

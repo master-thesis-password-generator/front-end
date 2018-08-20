@@ -33,7 +33,7 @@ export class RandomCharactersCookieService {
   public getCookie(): FormGroup {
     const cookieValue = this.cookieService.getCookieValue(this.COOKIE_NAME, this.DEFAULT_COOKIE_VALUE) as RCModel;
     return this.formBuilder.group({
-      password_length: [cookieValue.length, [Validators.required, Validators.min(20)]],
+      password_length: [cookieValue.length, [Validators.required, Validators.min(12)]],
       character_groups: this.formBuilder.array(
         cookieValue.groups.map(group => this.formBuilder.group({
           value: [group, Validators.required]
