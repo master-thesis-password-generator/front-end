@@ -15,7 +15,7 @@ export class SongsCookieService {
     mappings: [
       {
         mappedCharacter: 's',
-        mappings: '5T',
+        mappings: '5T$',
         mappingChance: 50
       }, {
         mappedCharacter: 'a',
@@ -28,6 +28,22 @@ export class SongsCookieService {
       }, {
         mappedCharacter: 't',
         mappings: '5sS',
+        mappingChance: 50
+      }, {
+        mappedCharacter: 'o',
+        mappings: '0u',
+        mappingChance: 50
+      }, {
+        mappedCharacter: 'i',
+        mappings: 'l1!',
+        mappingChance: 50
+      }, {
+        mappedCharacter: 'z',
+        mappings: 's',
+        mappingChance: 50
+      }, {
+        mappedCharacter: 'q',
+        mappings: 'o',
         mappingChance: 50
       }
     ],
