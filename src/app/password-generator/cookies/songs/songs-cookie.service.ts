@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { GeneratorCookiesService } from '../generator-cookies.service';
-import { RWFSRequest } from '../../random_words_from_songs/model/rwfsrequest';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Mapping } from '../../commons/mapping';
 
@@ -50,25 +49,26 @@ export class SongsCookieService {
     passwordLength: 12,
     rwCase: 'random',
     artist: 'Myslovitz'
-  } as RWFSRequest;
+  };
 
   public setCookie(data: FormGroup) {
     const passwordLength = data.get('password_length') as FormControl;
     const artist = data.get('artist') as FormControl;
     const caseMode = data.get('rwfsCase') as FormControl;
     const mappings = data.get('character_mappings') as FormArray;
-    this.cookieService.setCookie(this.COOKIE_NAME, new RWFSRequest(
-      mappings.getRawValue().map(mapping => {
+    this.cookieService.setCookie(this.COOKIE_NAME, {
+      mappings: mappings.getRawValue().map(mapping => {
         return new Mapping(mapping.character, mapping.mapping, mapping.chance);
       }),
-      passwordLength.value,
-      caseMode.value,
-      artist.value
-    ));
+      passwordLength: passwordLength.value,
+      rwCase: caseMode.value,
+      artist: artist.value,
+      lyricsLine: ''
+    });
   }
 
   public getCookie(): FormGroup {
-    const cookieValue = this.cookieService.getCookieValue(this.COOKIE_NAME, this.DEFAULT_COOKIE_VALUE) as RWFSRequest;
+    const cookieValue = this.cookieService.getCookieValue(this.COOKIE_NAME, this.DEFAULT_COOKIE_VALUE);
     return this.formBuilder.group({
       password_length: [cookieValue.passwordLength, [Validators.required, Validators.min(12)]],
       character_mappings: this.formBuilder.array(
@@ -79,7 +79,8 @@ export class SongsCookieService {
         }))
       ),
       rwfsCase: [cookieValue.rwCase, Validators.required],
-      artist: [cookieValue.artist, Validators.required]
+      artist: [cookieValue.artist, Validators.required],
+      lyricsLine: ['', Validators.required]
     });
   }
 }

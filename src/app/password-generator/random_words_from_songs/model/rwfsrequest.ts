@@ -1,11 +1,13 @@
-import { RWRequest } from '../../random_words/model/rwrequest';
 import { Mapping } from '../../commons/mapping';
 
-export class RWFSRequest extends RWRequest {
-  artist: string;
+export class RWFSRequest {
+  mappings: Mapping[];
+  casingRule: string;
+  songLine: string;
 
-  constructor(mappings: Mapping[], passwordLength: number, rwCase: string, artist: string) {
-    super(mappings, passwordLength, rwCase);
-    this.artist = artist;
+  constructor(mappings: Mapping[], casingRule: string, songLine: string) {
+    this.mappings = mappings;
+    this.casingRule = casingRule;
+    this.songLine = songLine;
   }
 }

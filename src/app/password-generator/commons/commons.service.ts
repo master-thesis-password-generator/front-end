@@ -6,8 +6,8 @@ export class CommonsService {
 
   constructor() {}
 
-  public static readonly MEDIUM_PASSWORD_ENTROPY = 80;
-  public static readonly STRONG_PASSWORD_ENTROPY = 120;
+  public static readonly MEDIUM_PASSWORD_CRACKING_TIME = 5e6;
+  public static readonly STRONG_PASSWORD_CRACKING_TIME = 1e9;
 
   public static readonly RW_COOKIE_NAME = 'rw_character_mappings';
   public static readonly RWFS_COOKIE_NAME = 'rwfs_character_groups';

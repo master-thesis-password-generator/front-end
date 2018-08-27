@@ -10,13 +10,13 @@ import { RWService } from './random_words/rw.service';
 import { RandomCharactersCookieService } from './cookies/characters/random-characters-cookie.service';
 import { RandomWordsCookieService } from './cookies/words/random-words-cookie.service';
 import { SongsCookieService } from './cookies/songs/songs-cookie.service';
-import { RWFSResponse } from './random_words_from_songs/model/rwfsresponse';
 import { SongsService } from './random_words_from_songs/songs.service';
-import { RWFSRequest } from './random_words_from_songs/model/rwfsrequest';
 import { TesterService } from './memory_tester/tester.service';
 import { TesterRequest } from './memory_tester/model/tester_request';
 import { PGToastrService } from './commons/toastr/pgtoastr.service';
 import { environment } from '../../environments/environment';
+import { Lyrics } from './random_words_from_songs/model/lyrics';
+import { RWFSRequest } from './random_words_from_songs/model/rwfsrequest';
 
 @Component({
   selector: 'password-generator',
@@ -55,8 +55,11 @@ export class PasswordGeneratorComponent implements OnInit {
   rwfs_form: FormGroup;
   rwfs_character_mappings: FormArray;
   rwfs_show_generation_results: boolean;
+  rwfs_show_generate_password_phase: boolean;
   rwfs_password_alert_type: string;
-  rwfs_password: RWFSResponse;
+  rwfs_password: RWResponse;
+  rwfs_song_lyrics: Lyrics;
+  rwfs_lyrics_lines: Set<string> = new Set<string>();
 
   /**
    * Memory testing
@@ -120,17 +123,15 @@ export class PasswordGeneratorComponent implements OnInit {
       this.rcService.getRandomCharactersPassword(this.apiLocation, data).subscribe(rcResult => {
         this.rc_password = rcResult;
         this.rc_show_generation_results = true;
-        if (rcResult.entropy < CommonsService.MEDIUM_PASSWORD_ENTROPY) {
+        const estimatedCrackingTime = Number(rcResult.crackingTime);
+        if (estimatedCrackingTime < CommonsService.MEDIUM_PASSWORD_CRACKING_TIME) {
           this.rc_password_alert_type = 'danger';
-        } else if (rcResult.entropy >= CommonsService.MEDIUM_PASSWORD_ENTROPY &&
-          rcResult.entropy < CommonsService.STRONG_PASSWORD_ENTROPY) {
+        } else if (estimatedCrackingTime >= CommonsService.MEDIUM_PASSWORD_CRACKING_TIME &&
+          estimatedCrackingTime < CommonsService.STRONG_PASSWORD_CRACKING_TIME) {
           this.rc_password_alert_type = 'warning';
         } else {
           this.rc_password_alert_type = 'success';
         }
-        this.test_form.patchValue({
-          random_characters: rcResult.password
-        });
         this.turnLoadingOff();
       }, err => {
         this.turnLoadingOff();
@@ -172,10 +173,11 @@ export class PasswordGeneratorComponent implements OnInit {
       this.rwService.getRandomWordsPassword(this.apiLocation, data).subscribe(rwResult => {
         this.rw_password = this.parseRWResults(rwResult);
         this.rw_show_generation_results = true;
-        if (rwResult.entropy < CommonsService.MEDIUM_PASSWORD_ENTROPY) {
+        const estimatedCrackingTime = Number(rwResult.crackingTime);
+        if (estimatedCrackingTime < CommonsService.MEDIUM_PASSWORD_CRACKING_TIME) {
           this.rw_password_alert_type = 'danger';
-        } else if (rwResult.entropy >= CommonsService.MEDIUM_PASSWORD_ENTROPY &&
-          rwResult.entropy < CommonsService.STRONG_PASSWORD_ENTROPY) {
+        } else if (estimatedCrackingTime >= CommonsService.MEDIUM_PASSWORD_CRACKING_TIME &&
+          estimatedCrackingTime < CommonsService.STRONG_PASSWORD_CRACKING_TIME) {
           this.rw_password_alert_type = 'warning';
         } else {
           this.rw_password_alert_type = 'success';
@@ -202,36 +204,51 @@ export class PasswordGeneratorComponent implements OnInit {
 
   parseRWResults(rwResponse: any): RWResponse {
     const colors = [];
-    for (let i = 0; i < rwResponse.used_words.length; i++) {
+    for (let i = 0; i < rwResponse.usedWords.length; i++) {
       colors.push(this.getRandomColor());
     }
     return new RWResponse(rwResponse.passwordWords,
-                          rwResponse.entropy,
-                          rwResponse.used_words,
+                          rwResponse.crackingTime,
+                          rwResponse.usedWords,
                           colors,
                           rwResponse.passwordWords.reduce((previousValue, currentValue) => previousValue + currentValue, ''),
                           rwResponse.isSafe);
   }
 
+  onGetLyricsSubmit() {
+    const artist = this.rwfs_form.get('artist') as FormControl;
+    this.turnLoadingOn();
+    this.rwfs_lyrics_lines.clear();
+    if (artist.value) {
+      this.songsService.getLyrics(this.apiLocation, artist.value).subscribe(lyrics => {
+        this.rwfs_song_lyrics = lyrics;
+        this.rwfs_show_generate_password_phase = true;
+        this.turnLoadingOff();
+      }, err => {
+        this.turnLoadingOff();
+        this.rwfs_show_generate_password_phase = false;
+      });
+    }
+  }
+
   onRWFSSubmit() {
     if (this.rwfs_form.valid) {
       this.turnLoadingOn();
-      const formControl = this.rwfs_form.get('password_length') as FormControl;
       const caseMode = this.rwfs_form.get('rwfsCase') as FormControl;
-      const artist = this.rwfs_form.get('artist') as FormControl;
+      const lyricsLine = this.rwfs_form.get('lyricsLine') as FormControl;
       const data = new RWFSRequest(
         this.rwfs_character_mappings.getRawValue(),
-        formControl.value,
         caseMode.value,
-        artist.value
+        lyricsLine.value
       );
       this.songsService.getSongWordsPassword(this.apiLocation, data).subscribe(rwResult => {
         this.rwfs_password = this.parseRWFSResults(rwResult);
         this.rwfs_show_generation_results = true;
-        if (rwResult.entropy < CommonsService.MEDIUM_PASSWORD_ENTROPY) {
+        const estimatedCrackingTime = Number(rwResult.crackingTime);
+        if (estimatedCrackingTime < CommonsService.MEDIUM_PASSWORD_CRACKING_TIME) {
           this.rwfs_password_alert_type = 'danger';
-        } else if (rwResult.entropy >= CommonsService.MEDIUM_PASSWORD_ENTROPY &&
-          rwResult.entropy < CommonsService.STRONG_PASSWORD_ENTROPY) {
+        } else if (estimatedCrackingTime >= CommonsService.MEDIUM_PASSWORD_CRACKING_TIME &&
+          estimatedCrackingTime < CommonsService.STRONG_PASSWORD_CRACKING_TIME) {
           this.rwfs_password_alert_type = 'warning';
         } else {
           this.rwfs_password_alert_type = 'success';
@@ -247,19 +264,17 @@ export class PasswordGeneratorComponent implements OnInit {
     }
   }
 
-  parseRWFSResults(rwResponse: any): RWFSResponse {
+  parseRWFSResults(rwResponse: any): RWResponse {
     const colors = [];
-    for (let i = 0; i < rwResponse.used_words.length; i++) {
+    for (let i = 0; i < rwResponse.usedWords.length; i++) {
       colors.push(this.getRandomColor());
     }
-    return new RWFSResponse(
-      rwResponse.password_words,
-      rwResponse.entropy,
-      rwResponse.used_words,
+    return new RWResponse(
+      rwResponse.passwordWords,
+      rwResponse.crackingTime,
+      rwResponse.usedWords,
       colors,
-      rwResponse.password_words.reduce((previousValue, currentValue) => previousValue + currentValue, ''),
-      rwResponse.lyrics,
-      rwResponse.song_name,
+      rwResponse.passwordWords.reduce((previousValue, currentValue) => previousValue + currentValue, ''),
       rwResponse.isSafe);
   }
 
@@ -277,7 +292,6 @@ export class PasswordGeneratorComponent implements OnInit {
 
   private createTestForm() {
     return this.formBuilder.group({
-      random_characters: ['', Validators.required],
       random_words: ['', Validators.required],
       words_from_song: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]]
@@ -287,12 +301,10 @@ export class PasswordGeneratorComponent implements OnInit {
   sendTestData() {
     if (this.test_form.valid) {
       this.turnLoadingOn();
-      const randomCharacters = this.test_form.get('random_characters') as FormControl;
       const randomWords = this.test_form.get('random_words') as FormControl;
       const wordsFromSong = this.test_form.get('words_from_song') as FormControl;
       const email = this.test_form.get('email') as FormControl;
-      const data = new TesterRequest(randomCharacters.value, randomWords.value,
-                                     wordsFromSong.value, email.value);
+      const data = new TesterRequest(randomWords.value, wordsFromSong.value, email.value);
 
       this.testerService.sendTestData(this.apiLocation, data).subscribe(result => {
         console.log(result);
@@ -307,6 +319,28 @@ export class PasswordGeneratorComponent implements OnInit {
         this.turnLoadingOff();
       });
     }
+  }
+
+  getEffectiveLineLength(line: string): number {
+    return line.replace(/\s/g, '').length;
+  }
+
+  wasLyricsLineUsed(line: string, isLast: any): boolean {
+    let result = false;
+    if (this.rwfs_lyrics_lines.has(line)) {
+      result = true;
+    } else {
+      this.rwfs_lyrics_lines.add(line);
+    }
+    if (isLast) {
+      this.clearLyricsLineCheck();
+    }
+
+    return result;
+  }
+
+  clearLyricsLineCheck() {
+    this.rwfs_lyrics_lines.clear();
   }
 
   turnLoadingOn() {

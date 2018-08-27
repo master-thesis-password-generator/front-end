@@ -1,9 +1,9 @@
 export class BasicResponse {
-  entropy: number;
+  crackingTime: string;
   isSafe: boolean;
 
-  constructor(entropy: number, isSafe: boolean) {
-    this.entropy = entropy;
+  constructor(crackingTime: string, isSafe: boolean) {
+    this.crackingTime = crackingTime;
     this.isSafe = isSafe;
   }
 }
