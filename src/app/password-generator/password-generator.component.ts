@@ -142,9 +142,9 @@ export class PasswordGeneratorComponent implements OnInit {
 
   createRWCharacterMappings(): FormGroup {
     return this.formBuilder.group({
-      character: '',
-      mapping: '',
-      chance: 50
+      character: ['', Validators.required],
+      mapping: ['', Validators.required],
+      chance: [50, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 
@@ -186,6 +186,9 @@ export class PasswordGeneratorComponent implements OnInit {
           random_words: this.rw_password.password
         });
         this.turnLoadingOff();
+        this.toastr.success('This password will be used in the memory test. ' +
+          'Please try to remember it and don\'t forget about generating a password using song\'s lyrics and participate in a test.',
+          'Password generated successfully!');
       }, err => {
         this.turnLoadingOff();
       });
@@ -257,6 +260,9 @@ export class PasswordGeneratorComponent implements OnInit {
           words_from_song: this.rwfs_password.password
         });
         this.turnLoadingOff();
+        this.toastr.success('This password will be used in the memory test. ' +
+          'Please try to remember it and don\'t forget about generating a password using random words and participate in a test.',
+          'Password generated successfully!');
       }, err => {
         this.turnLoadingOff();
       });
@@ -308,7 +314,7 @@ export class PasswordGeneratorComponent implements OnInit {
 
       this.testerService.sendTestData(this.apiLocation, data).subscribe(result => {
         console.log(result);
-        this.toastr.success('Test scheduled successfully. Please check your mail fot more info.',
+        this.toastr.success('Test scheduled successfully. Please check your mail for more info.',
                             'Thank you!');
         this.test_form = this.createTestForm();
         this.turnLoadingOff();

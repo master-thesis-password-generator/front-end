@@ -72,7 +72,7 @@ export class RandomWordsCookieService {
         cookieValue.mappings.map(mapping => this.formBuilder.group({
           character: [mapping.mappedCharacter, Validators.required],
           mapping: [mapping.mappings, Validators.required],
-          chance: [mapping.mappingChance, Validators.required]
+          chance: [mapping.mappingChance, [Validators.required, Validators.min(0), Validators.max(100)]]
         }))
       ),
       rwCase: [cookieValue.rwCase, Validators.required]
