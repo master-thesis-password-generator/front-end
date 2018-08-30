@@ -135,6 +135,7 @@ export class PasswordGeneratorComponent implements OnInit {
         this.turnLoadingOff();
       }, err => {
         this.turnLoadingOff();
+        this.toastr.error('Something went wrong, please try again!', 'Error');
       });
       this.rcCookieService.setCookie(this.rc_form);
     }
@@ -191,6 +192,7 @@ export class PasswordGeneratorComponent implements OnInit {
           'Password generated successfully!');
       }, err => {
         this.turnLoadingOff();
+        this.toastr.error('Something went wrong, please try again!', 'Error');
       });
       this.rwCookieService.setCookie(this.rw_form);
     }
@@ -265,6 +267,7 @@ export class PasswordGeneratorComponent implements OnInit {
           'Password generated successfully!');
       }, err => {
         this.turnLoadingOff();
+        this.toastr.error('Something went wrong, please try again!', 'Error');
       });
       this.rwfsCookieService.setCookie(this.rwfs_form);
     }
