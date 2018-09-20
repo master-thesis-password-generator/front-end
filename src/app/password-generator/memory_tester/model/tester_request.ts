@@ -1,12 +1,11 @@
 export class TesterRequest {
-  random_characters_password: string;
-  random_words_password: string;
-  song_password: string;
+  randomWordsPassword: string;
+  songPassword: string;
   email: string;
 
-  constructor(random_words_password: string, song_password: string, email: string) {
-    this.random_words_password = random_words_password;
-    this.song_password = song_password;
+  constructor(random_words_password: string, songPassword: string, email: string) {
+    this.randomWordsPassword = random_words_password;
+    this.songPassword = songPassword;
     this.email = email;
   }
 }
